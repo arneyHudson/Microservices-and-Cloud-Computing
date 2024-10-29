@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hudson Arney Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}"> <!-- Updated CSS link -->
+</head>
+<body>
+    <header>
+        <h1>Hudson Arney</h1>
+        <nav>
+            <a href="/projects">Projects</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </header>
+
+    <section id="about">
+        <h2>Welcome!</h2>
+        <p>Hello, I’m Hudson Arney, a passionate software developer and lifelong baseball fan. Explore my projects, skills, and feel free to reach out!</p>
+        <img src="{{ url_for('static', filename='images/baseball picture 2023.jpg') }}" alt="Baseball Picture 2023"> <!-- Updated image source -->
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Hudson Arney. All rights reserved.</p>
+    </footer>
+</body>
+</html>

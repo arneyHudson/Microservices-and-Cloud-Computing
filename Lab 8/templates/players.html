@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players</title>
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+        rel="stylesheet"
+    >
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Sports Analytics</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2>Players</h2>
+
+        <form method="POST" class="mt-4">
+            <div class="mb-3">
+                <label for="name" class="form-label">Player Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="home_runs" class="form-label">Home Runs</label>
+                <input type="number" class="form-control" id="home_runs" name="home_runs" required>
+            </div>
+            <div class="mb-3">
+                <label for="ops_plus" class="form-label">OPS+</label>
+                <input type="number" class="form-control" id="ops_plus" name="ops_plus" required>
+            </div>
+            <div class="mb-3">
+                <label for="war" class="form-label">WAR</label>
+                <input type="number" step="0.1" class="form-control" id="war" name="war" required>
+            </div>
+            <div class="mb-3">
+                <label for="owar" class="form-label">oWAR</label>
+                <input type="number" step="0.1" class="form-control" id="owar" name="owar" required>
+            </div>
+            <div class="mb-3">
+                <label for="dwar" class="form-label">dWAR</label>
+                <input type="number" step="0.1" class="form-control" id="dwar" name="dwar" required>
+            </div>
+            <div class="mb-3">
+                <label for="drs" class="form-label">DRS</label>
+                <input type="number" class="form-control" id="drs" name="drs" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Player</button>
+        </form>
+
+        <h3 class="mt-5">Player List</h3>
+        <ul class="list-group mt-3">
+            {% for player in players %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="/player/{{ player['id'] }}/stats">{{ player['name'] }}</a>
+                </div>
+                <div>
+                    <a href="/player/{{ player['id'] }}/update" class="btn btn-warning btn-sm me-2">Update</a>
+                    <form method="POST" action="/player/{{ player['id'] }}/delete" onsubmit="return confirm('Are you sure you want to delete this player?');" class="d-inline">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2024 Sports Analytics. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

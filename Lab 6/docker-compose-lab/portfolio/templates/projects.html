@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Hudson Arney</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>My Projects</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </header>
+
+    <section>
+        {% for project in projects %}
+            <h2>{{ project[1] }}</h2> <!-- Assuming project[1] is the project title -->
+            <p><strong>Date:</strong> {{ project[2] }}</p> <!-- Assuming project[2] is the date range -->
+            <p><strong>Associated with:</strong> {{ project[3] }}</p> <!-- Assuming project[3] is associated organization -->
+            <ul>
+                <li><strong>Background:</strong> {{ project[4] }}</li> <!-- Assuming project[4] is the background -->
+                <li><strong>Project Goal:</strong> {{ project[5] }}</li> <!-- Assuming project[5] is the project goal -->
+                <li>{{ project[6] }}</li> <!-- Additional project detail -->
+                <li>{{ project[7] }}</li> <!-- Additional project detail -->
+                <!-- Add more <li> items as needed depending on your database structure -->
+            </ul>
+            <p><strong>Skills:</strong> {{ project[8] }}</p> <!-- Assuming project[8] is the list of skills -->
+        {% endfor %}
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Hudson Arney. All rights reserved.</p>
+    </footer>
+</body>
+</html>

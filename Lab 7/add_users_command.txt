@@ -1,0 +1,7 @@
+$headers = @{
+    "Content-Type" = "application/json"
+}
+
+$body = Get-Content -Raw -Path "user-hudson.json"
+
+Invoke-WebRequest -Uri "http://127.0.0.1:61659/create" -Method POST -Headers $headers -Body $body

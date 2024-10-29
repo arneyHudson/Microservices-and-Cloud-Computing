@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Player</title>
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+        rel="stylesheet"
+    >
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Sports Analytics</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2>Update Player</h2>
+
+        <form method="POST" class="mt-4">
+            <div class="mb-3">
+                <label for="name" class="form-label">Player Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ player['name'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="home_runs" class="form-label">Home Runs</label>
+                <input type="number" class="form-control" id="home_runs" name="home_runs" value="{{ player['home_runs'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="ops_plus" class="form-label">OPS+</label>
+                <input type="number" class="form-control" id="ops_plus" name="ops_plus" value="{{ player['ops_plus'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="war" class="form-label">WAR</label>
+                <input type="number" step="0.1" class="form-control" id="war" name="war" value="{{ player['war'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="owar" class="form-label">oWAR</label>
+                <input type="number" step="0.1" class="form-control" id="owar" name="owar" value="{{ player['owar'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="dwar" class="form-label">dWAR</label>
+                <input type="number" step="0.1" class="form-control" id="dwar" name="dwar" value="{{ player['dwar'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="drs" class="form-label">DRS</label>
+                <input type="number" class="form-control" id="drs" name="drs" value="{{ player['drs'] }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Player</button>
+        </form>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2024 Sports Analytics. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

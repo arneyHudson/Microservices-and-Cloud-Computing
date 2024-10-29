@@ -1,0 +1,62 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a; /* Dark background */
+    color: #f0f0f0; /* Light text color */
+}
+
+header {
+    background-color: #003366; /* Dark blue header */
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    background-color: #cc0000; /* Red buttons */
+}
+
+nav a:hover {
+    background-color: #990000; /* Darker red on hover */
+}
+
+section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #2a2a2a; /* Dark gray section background */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1); /* Subtle light shadow */
+}
+
+h2 {
+    color: #f0f0f0; /* Light heading color */
+    font-size: 2em;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #cc0000; /* Red underline */
+    padding-bottom: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #003366; /* Dark blue footer */
+    color: white;
+    position: relative;
+    width: 100%;
+}
+
+img {
+    max-width: 100%; /* Responsive image */
+    border: 5px solid #f0f0f0; /* Light border around the image */
+    border-radius: 10px; /* Rounded corners */
+    display: block; /* Center the image */
+    margin: 0 auto; /* Center the image horizontally */
+}

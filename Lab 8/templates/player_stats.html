@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Stats</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .chart-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .chart {
+            width: 45%;
+            margin: 10px 0;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <!-- Include Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Player Stats for {{ player['name'] }}</h1>
+    
+    <!-- Display the player stats -->
+    <table>
+        <tr>
+            <th>Home Runs</th>
+            <th>OPS+</th>
+            <th>WAR</th>
+            <th>OWAR</th>
+            <th>DWAR</th>
+            <th>DRS</th>
+        </tr>
+        <tr>
+            <td>{{ player['home_runs'] }}</td>
+            <td>{{ player.get('ops_plus', 0) }}</td>
+            <td>{{ player.get('war', 0) }}</td>
+            <td>{{ player.get('owar', 0) }}</td>
+            <td>{{ player.get('dwar', 0) }}</td>
+            <td>{{ player.get('drs', 0) }}</td>
+        </tr>
+    </table>
+
+    <div class="chart-container">
+        <div class="chart">
+            <h3>Home Runs</h3>
+            <div>{{ plots_html['home_runs']|safe }}</div>
+        </div>
+        <div class="chart">
+            <h3>OPS+</h3>
+            <div>{{ plots_html['ops_plus']|safe }}</div>
+        </div>
+        <div class="chart">
+            <h3>WAR</h3>
+            <div>{{ plots_html['war']|safe }}</div>
+        </div>
+        <div class="chart">
+            <h3>OWAR</h3>
+            <div>{{ plots_html['owar']|safe }}</div>
+        </div>
+        <div class="chart">
+            <h3>DWAR</h3>
+            <div>{{ plots_html['dwar']|safe }}</div>
+        </div>
+        <div class="chart">
+            <h3>DRS</h3>
+            <div>{{ plots_html['drs']|safe }}</div>
+        </div>
+    </div>
+    <script>
+        // You can define additional plots using Plotly here if needed
+        // For example:
+        // const opsData = [{
+        //     x: ['Metric', 'Value'],
+        //     y: [{{ player.get('ops_plus', 0) }}]
+        // }];
+        // Plotly.newPlot('ops_plot', opsData);
+    </script>
+</body>
+</html>
