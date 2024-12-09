@@ -1,0 +1,5 @@
+[
+    { "product_id": 1, "name": "Milk", "costco_price": 3.99, "metro_price": 4.49 },
+    { "product_id": 2, "name": "Eggs", "costco_price": 2.99, "metro_price": 3.19 },
+    { "product_id": 3, "name": "Bread", "costco_price": 1.99, "metro_price": 2.29 }
+]

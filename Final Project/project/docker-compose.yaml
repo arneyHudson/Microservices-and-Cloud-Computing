@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  selenium:
+    build:
+      context: .
+      dockerfile: Dockerfile.selenium
+    ports:
+      - "4444:4444"  # Expose Selenium WebDriver's default port
+    container_name: selenium-container
+
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    ports:
+      - "8000:8000"  # Expose Flask app's port
+    container_name: flask-container
+    depends_on:
+      - selenium  # Ensure Selenium starts first

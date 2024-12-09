@@ -1,0 +1,5 @@
+Flask==3.0.3
+Flask-Cors==5.0.0
+beautifulsoup4
+selenium==4.27.1
+undetected_chromedriver==3.5.5

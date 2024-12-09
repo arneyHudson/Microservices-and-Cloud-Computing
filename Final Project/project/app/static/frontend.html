@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grocery Price Comparison</title>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <style>
+        /* Custom styling for the table */
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Custom colors for price difference */
+        .price-diff-positive {
+            color: green;
+        }
+
+        .price-diff-negative {
+            color: red;
+        }
+
+        .no-data {
+            color: #888;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Grocery themed button */
+        .btn-primary {
+            background-color: #2e8b57;
+            border-color: #2e8b57;
+        }
+
+        .btn-primary:hover {
+            background-color: #3cb371;
+            border-color: #3cb371;
+        }
+
+        .btn-secondary {
+            background-color: #f0ad4e;
+            border-color: #f0ad4e;
+        }
+
+        .btn-secondary:hover {
+            background-color: #ec971f;
+            border-color: #ec971f;
+        }
+
+        /* Additional button styling for sorting */
+        .sort-btn {
+            margin-top: 10px;
+        }
+
+        /* Aligning buttons below headers */
+        .sort-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .sort-buttons button {
+            flex: 1;
+            margin-right: 5px;
+        }
+
+        .sort-buttons button:last-child {
+            margin-right: 0;
+        }
+
+        /* Input field styling */
+        #search-bar {
+            width: 60%;
+            margin-right: 10px;
+        }
+        </style>
+    </head>
+    <body class="container mt-5">
+
+        <h1 class="text-center">Metro Market vs Walmart Price Comparison</h1>
+
+        <!-- Search input -->
+        <div class="input-group mb-3">
+            <input id="search-bar" class="form-control" type="text"
+                placeholder="Search for a product (e.g., Eggs, Milk)" />
+            <button id="search-button" class="btn btn-primary">Search</button>
+            <button id="clear-button" class="btn btn-secondary">Clear</button>
+        </div>
+
+        <!-- Sort options buttons -->
+        <div class="sort-buttons">
+            <label for="sort-options"
+                style="margin-right: 10px; align-self: center;">Sort By:</label>
+            <button id="sort-metro-price" class="btn sort-btn"
+                style="background-color: #6a8912;">Metro Price (Asc)</button>
+            <button id="sort-metro-unit-price" class="btn sort-btn"
+                style="background-color: #fa37d0;">Metro Price Per Unit
+                (Asc)</button>
+            <button id="sort-walmart-price" class="btn sort-btn"
+                style="background-color: #0382c5;">Walmart Price (Asc)</button>
+            <button id="sort-walmart-unit-price" class="btn sort-btn"
+                style="background-color: #37fa88;">Walmart Price Per Unit
+                (Asc)</button>
+            <button id="sort-price-diff" class="btn sort-btn"
+                style="background-color: #fabc37;">Price Difference
+                (Asc)</button>
+            <button id="sort-unit-price-diff" class="btn sort-btn"
+                style="background-color: #375bfa;">Unit Price Difference
+                (Asc)</button>
+        </div>
+
+        <!-- Table for displaying price comparison -->
+        <table id="price-table" class="table">
+            <thead>
+                <tr>
+                    <th>Metro Product</th>
+                    <th>Metro Price</th>
+                    <th>Price Per Unit (Metro)</th>
+                    <th>Walmart Product</th>
+                    <th>Walmart Price</th>
+                    <th>Price Per Unit (Walmart)</th>
+                    <th>Price Difference Total</th>
+                    <th>Price Difference Per Unit</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <script>
+        const API_KEY = 'your-secure-api-key';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const storedData = localStorage.getItem("priceComparisonData");
+            if (storedData) {
+                renderTable(JSON.parse(storedData));
+            }
+
+            async function updateUI(searchTerm) {
+                try {
+                    const compareResponse = await fetch(`http://localhost:8000/compare?search=${searchTerm}`);
+                    if (!compareResponse.ok) {
+                        console.warn(`Compare fetch failed with status: ${compareResponse.status}`);
+                        return;
+                    }
+                    const compareData = await compareResponse.json();
+                    console.log("Fetched comparison data:", compareData);
+
+                    if (!compareData || Object.keys(compareData).length === 0) {
+                        console.warn("No product data found");
+                        return;
+                    }
+
+                    const products = Object.keys(compareData).map(productKey => compareData[productKey]);
+                    localStorage.setItem("priceComparisonData", JSON.stringify(products));
+                    renderTable(products);
+                } catch (error) {
+                    console.error("Error fetching comparison data:", error);
+                }
+            }
+
+            function renderTable(products) {
+                const tableBody = document.querySelector("#price-table tbody");
+                tableBody.innerHTML = "";
+
+                if (!products || products.length === 0) {
+                    tableBody.innerHTML = "<tr><td colspan='5' class='no-data'>No products found</td></tr>";
+                    return;
+                }
+
+                products.forEach(product => {
+                    const metroProduct = product?.metro || null;
+                    const walmartProduct = product?.walmart || null;
+                    const metroPrice = metroProduct?.price || null;
+                    const walmartPrice = walmartProduct?.price || null;
+                    console.log(product);
+
+                    const metroPricePerUnit = (metroProduct?.price_per_count && !isNaN(metroProduct.price_per_count)) ? metroProduct.price_per_count.toFixed(2) : "N/A";
+                    const walmartPricePerUnit = (walmartProduct?.price_per_count && !isNaN(walmartProduct.price_per_count)) ? walmartProduct.price_per_count.toFixed(2) : "N/A";
+                    console.log(metroPricePerUnit);
+                    console.log(walmartPricePerUnit);
+
+                    const priceDiffPerUnit = (metroPricePerUnit && walmartPricePerUnit) 
+                        ? Math.abs((metroPricePerUnit - walmartPricePerUnit)).toFixed(2) 
+                        : null;
+                    const priceDifference = (metroPrice && walmartPrice) ? (metroPrice - walmartPrice).toFixed(2) : null;
+
+
+                    const row = document.createElement("tr");
+
+                    const metroProductNameCell = document.createElement("td");
+                    metroProductNameCell.textContent = metroProduct ? metroProduct.name : "N/A";
+                    row.appendChild(metroProductNameCell);
+
+                    const metroPriceCell = document.createElement("td");
+                    metroPriceCell.textContent = metroPrice !== null ? `$${metroPrice.toFixed(2)}` : "N/A";
+                    if (metroPrice !== null && walmartPrice !== null) {
+                        const metroPriceRatio = metroPrice / walmartPrice;
+                        metroPriceCell.style.backgroundColor = getGradientColor(metroPriceRatio, 'metro');
+                    }
+                    row.appendChild(metroPriceCell);
+
+                    const metroPricePerUnitCell = document.createElement("td");
+                    metroPricePerUnitCell.textContent = metroPricePerUnit !== null ? `$${metroPricePerUnit}` : "N/A";
+                    row.appendChild(metroPricePerUnitCell);
+
+                    const walmartProductNameCell = document.createElement("td");
+                    walmartProductNameCell.textContent = walmartProduct ? walmartProduct.name : "N/A";
+                    row.appendChild(walmartProductNameCell);
+
+                    const walmartPriceCell = document.createElement("td");
+                    walmartPriceCell.textContent = walmartPrice !== null ? `$${walmartPrice.toFixed(2)}` : "N/A";
+                    if (metroPrice !== null && walmartPrice !== null) {
+                        const walmartPriceRatio = walmartPrice / metroPrice;
+                        walmartPriceCell.style.backgroundColor = getGradientColor(walmartPriceRatio, 'walmart');
+                    }
+                    row.appendChild(walmartPriceCell);
+
+                    const walmartPricePerUnitCell = document.createElement("td");
+                    walmartPricePerUnitCell.textContent = walmartPricePerUnit !== null ? `$${walmartPricePerUnit}` : "N/A";
+                    row.appendChild(walmartPricePerUnitCell);
+
+                    const priceDiffCell = document.createElement("td");
+                    if (priceDifference !== null) {
+                        const priceDiffClass = priceDifference > 0 ? 'price-diff-negative' : 'price-diff-positive';
+                        priceDiffCell.classList.add(priceDiffClass);
+                        priceDiffCell.textContent = `$${Math.abs(priceDifference)}`;
+                    } else {
+                        priceDiffCell.textContent = "N/A";
+                    }
+                    row.appendChild(priceDiffCell);
+
+                    const priceDiffPerUnitCell = document.createElement("td");
+                    priceDiffPerUnitCell.textContent = priceDiffPerUnit !== null ? `$${priceDiffPerUnit}` : "N/A";
+                    row.appendChild(priceDiffPerUnitCell);
+
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function getGradientColor(ratio, store) {
+                const maxDifference = 1.2;
+                let color = '';
+                const normalizedRatio = Math.min(maxDifference, Math.max(1 / maxDifference, ratio));
+
+                const maxGreen = [151, 237, 159];
+                const maxRed = [255, 93, 93];
+                
+                if (store === 'metro') {
+                    if (ratio < 1) {
+                        const greenIntensity = Math.min(255, Math.floor(255 * (1 - normalizedRatio)));
+                        color = `rgb(${maxGreen[0]}, ${maxGreen[1] - Math.floor(greenIntensity)}, ${maxGreen[2] - Math.floor(greenIntensity)})`;
+                    } else {
+                        const redIntensity = Math.min(255, Math.floor(255 * (normalizedRatio - 1)));
+                        color = `rgb(${maxRed[0] - Math.floor(redIntensity)}, ${maxRed[1] - Math.floor(redIntensity)}, ${maxRed[2] - Math.floor(redIntensity)})`;
+                    }
+                } else if (store === 'walmart') {
+                    if (ratio < 1) {
+                        const greenIntensity = Math.min(255, Math.floor(255 * (1 - normalizedRatio)));
+                        color = `rgb(${maxGreen[0]}, ${maxGreen[1] - Math.floor(greenIntensity)}, ${maxGreen[2] - Math.floor(greenIntensity)})`;
+                    } else {
+                        const redIntensity = Math.min(255, Math.floor(255 * (normalizedRatio - 1)));
+                        color = `rgb(${maxRed[0] - Math.floor(redIntensity)}, ${maxRed[1] - Math.floor(redIntensity)}, ${maxRed[2] - Math.floor(redIntensity)})`;
+                    }
+                }
+
+                return color;
+            }
+
+            let sortOrder = {
+                'metro-price': 'asc',
+                'walmart-price': 'asc',
+                'price-diff': 'asc'
+            };
+
+            const sortData = (field) => {
+                const products = JSON.parse(localStorage.getItem("priceComparisonData"));
+    
+                // Ensure data exists before sorting
+                if (!products) return;
+                
+                products.sort((a, b) => {
+                    let priceA, priceB;
+
+                    switch(field) {
+                        case 'metro-price':
+                            priceA = a.metro?.price || 0;
+                            priceB = b.metro?.price || 0;
+                            break;
+                        case 'metro-unit-price':
+                            priceA = a.metro?.price_per_count || 0;
+                            priceB = b.metro?.price_per_count || 0;
+                            break;
+                        case 'walmart-price':
+                            priceA = a.walmart?.price || 0;
+                            priceB = b.walmart?.price || 0;
+                            break;
+                        case 'walmart-unit-price':
+                            priceA = a.walmart?.price_per_count || 0;
+                            priceB = b.walmart?.price_per_count || 0;
+                            break;
+                        case 'price-diff':
+                            priceA = Math.abs((a.metro?.price || 0) - (a.walmart?.price || 0));
+                            priceB = Math.abs((b.metro?.price || 0) - (b.walmart?.price || 0));
+                            break;
+                        case 'unit-price-diff':
+                            priceA = Math.abs((a.metro?.price_per_count || 0) - (a.walmart?.price_per_count || 0));
+                            priceB = Math.abs((b.metro?.price_per_count || 0) - (b.walmart?.price_per_count || 0));
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    return sortOrder[field] === 'asc' ? priceA - priceB : priceB - priceA;
+                });
+                renderTable(products);
+            };
+
+            const toggleSortOrder = (field) => {
+                sortOrder[field] = sortOrder[field] === 'asc' ? 'desc' : 'asc';
+                return sortOrder[field];
+            };
+
+            document.getElementById("sort-metro-price").addEventListener("click", () => {
+                const newOrder = toggleSortOrder('metro-price');
+                document.getElementById("sort-metro-price").textContent = `Metro Price (${newOrder === 'asc' ? 'Asc' : 'Desc'})`;
+                sortData("metro-price");
+            });
+
+            document.getElementById("sort-metro-unit-price").addEventListener("click", () => {
+                const newOrder = toggleSortOrder('metro-unit-price');
+                document.getElementById("sort-metro-unit-price").textContent = `Metro Price (${newOrder === 'asc' ? 'Asc' : 'Desc'})`;
+                sortData("metro-unit-price");
+            });
+
+            document.getElementById("sort-walmart-price").addEventListener("click", () => {
+                const newOrder = toggleSortOrder('walmart-price');
+                document.getElementById("sort-walmart-price").textContent = `Walmart Price (${newOrder === 'asc' ? 'Asc' : 'Desc'})`;
+                sortData("walmart-price");
+            });
+
+            document.getElementById("sort-walmart-unit-price").addEventListener("click", () => {
+                const newOrder = toggleSortOrder('walmart-unit-price');
+                document.getElementById("sort-walmart-unit-price").textContent = `Walmart Price (${newOrder === 'asc' ? 'Asc' : 'Desc'})`;
+                sortData("walmart-unit-price");
+            });
+
+            document.getElementById("sort-price-diff").addEventListener("click", () => {
+                const newOrder = toggleSortOrder('price-diff');
+                document.getElementById("sort-price-diff").textContent = `Price Difference (${newOrder === 'asc' ? 'Asc' : 'Desc'})`;
+                sortData("price-diff");
+            });
+
+            document.getElementById("sort-unit-price-diff").addEventListener("click", () => {
+                const newOrder = toggleSortOrder('unit-price-diff');
+                document.getElementById("sort-unit-price-diff").textContent = `Price Difference (${newOrder === 'asc' ? 'Asc' : 'Desc'})`;
+                sortData("unit-price-diff");
+            });
+
+            document.getElementById("search-button").addEventListener("click", () => {
+                const searchTerm = document.getElementById("search-bar").value.trim();
+                if (searchTerm) {
+                    updateUI(searchTerm);
+                }
+            });
+
+            document.getElementById("clear-button").addEventListener("click", () => {
+                // Clear the saved data from localStorage
+                localStorage.removeItem("priceComparisonData");
+
+                // Clear the table content
+                const tableBody = document.querySelector("#price-table tbody");
+                tableBody.innerHTML = "<tr><td colspan='5' class='no-data'>No products found</td></tr>";
+            });
+
+        });
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,5 @@
+# Selenium Dockerfile
+FROM selenium/standalone-chrome:latest
+
+# Expose Selenium's default port
+EXPOSE 4444

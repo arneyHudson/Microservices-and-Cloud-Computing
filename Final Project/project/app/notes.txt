@@ -1,0 +1,181 @@
+import difflib
+import re
+from project.app.brand_extractor import BrandExtractor
+
+
+metro_results = [{'name': "Roundy's Large White Eggs 18 ct", 'price': 5.99}, {'name': "Roundy's Large White Eggs 12 ct", 'price': 3.99}, {'name': 'Simple Truth Natural Cage Free Large Brown Eggs 12 ct', 'price': 4.49}, {'name': 'Simple Truth Natural Cage Free Large Brown Eggs 18 ct', 'price': 6.49}, {'name': "Eggland's Best Classic Large White Eggs, 18 count 18 ct", 'price': 5.49}, {'name': 'S&R Egg Farm Large White Eggs 6 ct', 'price': 2.99}, {'name': "Eggland's Best Classic Large White Eggs, 24 count 24 ct", 'price': 6.99}, {'name': "Roundy's 60 Count Large White Eggs 60 ct", 'price': 19.95}, {'name': 'Dutch Farms Large White Eggs 6 ct', 'price': 1.79}, {'name': "Eggland's Best Classic Extra Large White Eggs, 12 count 12 ct", 'price': 3.79}, {'name': 'Dutch Farms Large White Eggs 18 ct', 'price': 4.99}, {'name': 'Dutch Farms Large White Eggs 30 ct', 'price': 7.99}, {'name': "Roundy's Jumbo White Eggs 12 ct", 'price': 4.39}, {'name': "Roundy's Extra Large White Eggs 12 ct", 'price': 4.19}, {'name': 'Simple Truth Organic Cage Free Large Brown Eggs 18 ct', 'price': 7.99}, {'name': "Phil's Free Range Large Eggs 12 ct", 'price': 4.99}, {'name': "Eggland's Best Classic Large White Eggs, 12 count 12 ct", 'price': 3.99}, {'name': 'Happy Egg Co. Free Range Large Brown Eggs 18 ct', 'price': 7.99}, {'name': "Phil's Cage Free Medium Eggs 12 ct", 'price': 3.79}, {'name': "Eggland's Best Pasture Raised Large Brown Eggs 12 ct", 'price': 6.29}, {'name': 'Vital Farms Pasture-Raised Large Brown Eggs 12 ct |', 'price': 7.99}, {'name': 'Simple Truth Natural Cage Free Medium Brown Eggs 12 ct', 'price': 4.39}, {'name': 'Dutch Farms Large White Eggs 12 ct', 'price': 4.29}, {'name': 'Vital Farms Pasture-Raised Large Brown Organic Eggs 12 ct', 'price': 9.99}]
+
+walmart_results = [{'name': 'Great Value, Large White Eggs, 12 Count', 'price': 3.97}, {'name': 'Great Value Large White Eggs, 18 Count', 'price': 5.87}, {'name': 'Great Value Large White Eggs, 36 Count', 'price': 11.67}, {'name': 'Great Value Large White Eggs, 60 Count', 'price': 19.26}, {'name': 'Marketside Cage-Free Large Brown Eggs, 18 Count', 'price': 7.82}, {'name': 'Great Value Extra Large White Eggs, 18 Count', 'price': 6.56}, {'name': 'Great Value Large White Eggs, 6 Count', 'price': 2.28}, {'name': "Eggland's Best Large White Eggs, 18 Count", 'price': 5.12}, {'name': 'Marketside Large Cage-Free Brown Eggs, 12 Count', 'price': 5.54}, {'name': 'Great Value Cage-Free White Eggs, Large, 18 Count', 'price': 4.76}, {'name': 'Great Value Cage Free Large White Eggs, 12 Count', 'price': 3.22}, {'name': 'Vital Farms Pasture Raised Grade A Large Brown Eggs, 12 Count', 'price': 7.08}, {'name': "Eggland's Best Extra Large White Eggs, 12 Count", 'price': 3.68}, {'name': "Eggland's Best Extra Large White Eggs, 18 Count", 'price': 7.33}, {'name': 'Great Value, Jumbo White Eggs, 12 Count', 'price': 4.96}, {'name': 'Great Value Hard Boiled Eggs, 9.31 oz, 6 Count', 'price': 3.16}, {'name': 'Blue Sky Farms Free Range, Large Brown Eggs, 12 Count', 'price': 4.94}, {'name': 'Great Value Large Brown Eggs, 12 Count', 'price': 4.72}, {'name': "Eggland's Best 100% USDA Organic Certified Large Brown Eggs, 12 Count", 'price': 6.0}, {'name': 'Blue Sky Farms Organic, Free Range Large Brown Eggs, 12 Count', 'price': 5.94}, {'name': 'Great Day Farms Hard-Boiled Eggs, 9 oz, 6 Count', 'price': 2.97}, {'name': 'Great Day Farms Hard-Boiled Eggs, 2 Eggs', 'price': 1.57}, {'name': 'STICKY FRIED EGGS (12 CT)', 'price': 28.99}, {'name': '30 hole quail egg cartons for jumbo quail eggs 50 count', 'price': 47.29}, {'name': 'Crystal Joys Rose Quartz Ema Egg, Purple', 'price': 8.0}, {'name': 'Eastland Food Asian Best  Quail Eggs, 15 oz', 'price': 10.99}, {'name': "Patrick's Best Garden Eggs 800g", 'price': 13.99}, {'name': 'Eggs, Set of 8', 'price': 52.69}, {'name': "2pcs Pickled Eggs, o Artificial Igrediets, Glute , 0g Sugar, 6g Protei, Grade A Eggs, Boiled ad Peeled (16oz, Garlic ' Oio)", 'price': 42.38}, {'name': 'Amish Wedding Pickled Eggs, 32 Oz Glass Jar, Ready to Eat', 'price': 21.3}, {'name': 'Just Crack an Egg All American Scramble Breakfast Bowl Kit with Potatoes, Sharp Cheddar Cheese and Uncured Bacon, 3 oz. Cup', 'price': 2.56}, {'name': 'Egg Blue', 'price': 105.05}, {'name': '12 Freeze Dried Duck Eggs approximately 8 oz', 'price': 30.0}, {'name': "Herb's Pickled Eggs 67 oz Gallon size plastic jar Packed In Vinegar", 'price': 55.99}, {'name': 'Blue Eggs in Carton 3.5x5.5"', 'price': 16.97}, {'name': 'Crystal Joys Clear Quartz Ema Egg, Purple', 'price': 8.0}]
+
+
+
+
+
+
+
+
+
+
+
+metro_results = [{'name': 'Kiwi 1 ct', 'price': 0.8}, {'name': 'Simple Truth Organic Kiwifruit 16 oz', 'price': 4.49}, {'name': 'V8 +Energy Sparkling Strawberry Kiwi Juice Energy Drink Can 4 pk / 11.5 fl oz', 'price': 5.99}, {'name': 'Mighties Green Fresh Kiwi Fruit 2 lb', 'price': 6.29}, {'name': 'Zespri Sungold Fresh Kiwi Fruit 1 lb', 'price': 4.79}, {'name': 'Ghost Hydration Kiwi Strawberry Sports Drink 16.9 fl oz', 'price': 1.77}, {'name': 'Fresh Ripe Whole Pineapple 1 ct', 'price': 2.69}, {'name': 'Fresh Banana - Single $0.55/lb', 'price': 0.23}, {'name': 'Red Kiwi 1 lb', 'price': 4.99}, {'name': 'Fresh Blueberries 1 pt', 'price': 4.99}, {'name': 'Large Avocado 1 ct', 'price': 2.0}, {'name': 'Fresh Brown Coconut 1 ct', 'price': 1.99}, {'name': 'Fresh Strawberries 1 lb', 'price': 4.49}, {'name': 'Snapple Strawberry Kiwi Juice Mini Bottles 8 pk / 8 fl oz', 'price': 6.99}, {'name': 'Fresh Brown Coconuts 1 ct', 'price': 2.49}, {'name': 'Snapple Zero Sugar Kiwi Strawberry Fruit Juice Drink Multipack Bottles 6 pk/ 16 fl oz', 'price': 6.99}, {'name': 'Fresh Blueberries 18 oz', 'price': 3.99}, {'name': 'Gatorade Zero Sugar Pink Strawberry Kiwi Sports Drink Bottle 28 fl oz', 'price': 2.19}, {'name': 'Papayas 1 ct', 'price': 4.29}, {'name': 'Fresh Strawberries 32 oz', 'price': 8.49}, {'name': 'Organic Banana 1 lb', 'price': 0.3}, {'name': 'Fresh Blackberries 12 oz', 'price': 3.99}, {'name': 'Banana 1 ct', 'price': 0.23}, {'name': 'Capri Sun Strawberry Kiwi Juice Box Pouches 6 fl oz / 30 ct', 'price': 9.99}, {'name': 'Fresh Organic Banana - Single $0.75/lb', 'price': 0.3}]
+# Milk
+#[{'name': 'Slate Dark Chocolate High Protein Milk Shake 11 fl oz', 'price': 2.5}, {'name': 'Simple Truth Organic 2% Reduced Fat Milk Half Gallon 1/2 gal |', 'price': 4.19}, {'name': 'Simple Truth Organic Vitamin D Whole Milk Half Gallon 1/2 gal |', 'price': 4.19}, {'name': 'Slate Classic Chocolate High Protein Milk Shake 11 fl oz', 'price': 2.5}, {'name': 'fairlife Ultra-Filtered Milk, Lactose Free, High Protein, Fat Free Milk 52 fl oz', 'price': 5.79}, {'name': 'Kroger Lactose Free 2% Reduced Fat Milk Half Gallon 1/2 gal', 'price': 3.99}, {'name': "Roundy's Select 2% Reduced Fat Milk 1 Gallon", 'price': 2.99}, {'name': 'Malk Vanilla Oat Milk 28 fl oz', 'price': 6.99}, {'name': 'fairlife Ultra-Filtered Milk, Lactose Free, High Protein, Whole Milk 52 fl oz', 'price': 5.79}, {'name': "Roundy's Select 2% Reduced Fat Milk 1/2 Gallon", 'price': 1.99}, {'name': 'Kroger CARBmaster Ultra Filtered Skim Vanilla Milk 59 fl oz', 'price': 4.99}, {'name': 'Simple Truth Organic Lactose Free 2% Reduced Fat Milk Half Gallon 1/2 gal', 'price': 4.19}, {'name': 'Horizon Organic Lactose Free 2% Reduced Fat Milk Half Gallon 1/2 gal', 'price': 5.99}, {'name': 'Horizon Organic Lowfat Chocolate Milk 12 ct / 8 fl oz', 'price': 15.99}, {'name': 'Horizon Organic Lowfat Chocolate Milk 6 ct / 8 fl oz', 'price': 8.49}, {'name': 'Horizon Organic 1% Lowfat Strawberry Milk 12 ct / 8 fl oz', 'price': 15.99}, {'name': 'Horizon Organic DHA Omega-3 Lowfat Chocolate Milk 6 ct / 8 fl oz', 'price': 9.29}, {'name': 'Horizon Organic 1% Lowfat Vanilla Milk 6 ct / 8 fl oz', 'price': 8.49}, {'name': 'Simple Truth Organic 1% Lowfat Chocolate Milk 12 bottles / 8 fl oz', 'price': 10.99}, {'name': 'Horizon Organic Shelf-Stable 1% Low Fat Milk Box - Vanilla 8 fl oz', 'price': 1.79}, {'name': 'Horizon Organic Shelf-Stable 1% Low Fat Milk Box - Strawberry 8 fl oz', 'price': 1.79}, {'name': 'Horizon Organic Shelf-Stable 1% Low Fat Milk Box - Chocolate 8 fl oz', 'price': 1.79}, {'name': 'Simple Truth Organic Skim Fat Free Milk Half Gallon 1/2 gal |', 'price': 4.19}, {'name': 'Horizon Organic 2% Reduced Fat Milk Half Gallon 1/2 gal', 'price': 5.99}, {'name': 'Organic Valley 2% Reduced Fat Milk Half Gallon 1/2 gal', 'price': 5.49}, {'name': 'Simple Truth Organic 100% Grassfed 2% Reduced Fat Milk Half Gallon 1/2 gal', 'price': 6.29}, {'name': 'Simple Truth Organic 2% Reduced Fat Milk with DHA Omega-3 Half Gallon 1/2 gal', 'price': 4.19}]
+
+# Eggs
+#[{'name': "Roundy's Large White Eggs 18 ct", 'price': 5.99}, {'name': "Roundy's Large White Eggs 12 ct", 'price': 3.99}, {'name': 'Simple Truth Natural Cage Free Large Brown Eggs 12 ct', 'price': 4.49}, {'name': 'Simple Truth Natural Cage Free Large Brown Eggs 18 ct', 'price': 6.49}, {'name': "Eggland's Best Classic Large White Eggs, 18 count 18 ct", 'price': 5.49}, {'name': 'S&R Egg Farm Large White Eggs 6 ct', 'price': 2.99}, {'name': "Eggland's Best Classic Large White Eggs, 24 count 24 ct", 'price': 6.99}, {'name': "Roundy's 60 Count Large White Eggs 60 ct", 'price': 19.95}, {'name': 'Dutch Farms Large White Eggs 6 ct', 'price': 1.79}, {'name': "Eggland's Best Classic Extra Large White Eggs, 12 count 12 ct", 'price': 3.79}, {'name': 'Dutch Farms Large White Eggs 18 ct', 'price': 4.99}, {'name': 'Dutch Farms Large White Eggs 30 ct', 'price': 7.99}, {'name': "Roundy's Jumbo White Eggs 12 ct", 'price': 4.39}, {'name': "Roundy's Extra Large White Eggs 12 ct", 'price': 4.19}, {'name': 'Simple Truth Organic Cage Free Large Brown Eggs 18 ct', 'price': 7.99}, {'name': "Phil's Free Range Large Eggs 12 ct", 'price': 4.99}, {'name': "Eggland's Best Classic Large White Eggs, 12 count 12 ct", 'price': 3.99}, {'name': 'Happy Egg Co. Free Range Large Brown Eggs 18 ct', 'price': 7.99}, {'name': "Phil's Cage Free Medium Eggs 12 ct", 'price': 3.79}, {'name': "Eggland's Best Pasture Raised Large Brown Eggs 12 ct", 'price': 6.29}, {'name': 'Vital Farms Pasture-Raised Large Brown Eggs 12 ct |', 'price': 7.99}, {'name': 'Simple Truth Natural Cage Free Medium Brown Eggs 12 ct', 'price': 4.39}, {'name': 'Dutch Farms Large White Eggs 12 ct', 'price': 4.29}, {'name': 'Vital Farms Pasture-Raised Large Brown Organic Eggs 12 ct', 'price': 9.99}]
+
+walmart_results = [{'name': 'Great Value Whole Vitamin D Milk, Gallon, Plastic, Jug, 128 Fl Oz', 'price': 2.66}, {'name': 'Great Value, 2% Reduced Fat Milk, Gallon, Refrigerated', 'price': 2.66}, {'name': 'Great Value Milk Whole Vitamin D, Half Gallon, Plastic, Jug, 64oz', 'price': 1.86}, {'name': 'Great Value Milk, 2% Reduced Fat, Half Gallon, 64 fl oz Jug', 'price': 1.68}, {'name': 'Great Value 1% Low-Fat Milk, 1 Gallon Jug', 'price': 2.66}, {'name': 'Great Value 1% Low-fat Chocolate Milk Gallon, Plastic, Jug, 128 Fl Oz', 'price': 2.66}, {'name': 'Great Value Fat-Free Milk Gallon, Plastic, Jug, 128 Fl Oz', 'price': 2.66}, {'name': 'Great Value Milk 1% Lowfat Half Gallon Plastic Jug', 'price': 1.62}, {'name': 'Kemps Select Whole Milk with Vitamin D - 16 fl oz', 'price': 1.28}, {'name': 'Kemps Select 1% Reduced Fat Milk - Gallon', 'price': 4.12}, {'name': 'Kemps Select 2% Reduced Fat Milk - Gallon', 'price': 4.13}, {'name': 'Kemps Select Whole Milk - Gallon', 'price': 4.53}, {'name': 'Kemps Select Whole Milk with Vitamin D - 32 fl oz', 'price': 2.18}, {'name': 'fairlife Lactose Free 2% Reduced Fat Ultra Filtered Milk, 52 fl oz', 'price': 4.97}, {'name': 'Kemps Select 2% Reduced Fat Milk - 16 fl oz', 'price': 1.28}, {'name': 'Great Value Lactose Free 2% Reduced Fat Milk, Half Gallon, 64 fl oz', 'price': 3.38}, {'name': 'fairlife Lactose Free Fat Free Ultra Filtered Milk, 52 fl oz', 'price': 4.97}, {'name': 'fairlife Lactose Free Ultra Filtered Whole Milk, 52 fl oz', 'price': 4.97}, {'name': 'Great Value Lactose Free Whole Vitamin D Milk, Half Gallon, 64 fl oz', 'price': 3.38}, {'name': 'Kemps Select Fat Free Skim Milk - Gallon', 'price': 3.74}, {'name': 'Great Value Milk, Fat Free, Unflavored, Half Gallon, 64 oz Jug', 'price': 1.62}, {'name': 'Kemps Select Whole Milk with Vitamin D - 64 fl oz', 'price': 2.47}, {'name': 'Great Value 1% Low-fat Chocolate Milk Half Gallon, Plastic, Jug, 64 Fl Oz', 'price': 1.67}, {'name': 'TruMoo Chocolate Whole Milk Half Gallon', 'price': 3.56}, {'name': 'Great Value Organic Whole Vitamin D Milk, Gallon, 128 fl oz', 'price': 6.98}, {'name': 'Kemps Select 1% Lowfat Milk - 64 fl oz', 'price': 2.26}, {'name': 'Oatsome Organic Oat Milk, 1-Liter Carton, 33.8 Fl Oz (Pack of 1)', 'price': 3.67}, {'name': 'Kemps Select Fat Free Skim Milk - 64 fl oz', 'price': 2.0}, {'name': 'Almond Breeze Unsweetened Vanilla Almond Milk, 96 fl oz', 'price': 4.56}, {'name': 'Great Value Organic 2% Reduced Fat Milk, Half Gallon, 64 fl oz', 'price': 3.98}, {'name': 'Great Value Organic Whole Vitamin D Milk, Half Gallon, 64 fl oz', 'price': 3.98}, {'name': 'Almond Breeze Unsweetened Original Almond Milk, 64 oz, Dairy Free, Refrigerated, Cardboard Box', 'price': 3.38}, {'name': 'Lactaid Whole Milk, 96 oz', 'price': 6.38}, {'name': 'Organic Valley, Organic Whole Milk, Grassfed, Half Gallon Carton, 64 oz', 'price': 5.84}]
+#[{'name': 'Great Value, Large White Eggs, 12 Count', 'price': 3.97}, {'name': 'Great Value Large White Eggs, 18 Count', 'price': 5.87}, {'name': 'Great Value Large White Eggs, 36 Count', 'price': 11.67}, {'name': 'Great Value Large White Eggs, 60 Count', 'price': 19.26}, {'name': 'Marketside Cage-Free Large Brown Eggs, 18 Count', 'price': 7.82}, {'name': 'Great Value Extra Large White Eggs, 18 Count', 'price': 6.56}, {'name': 'Great Value Large White Eggs, 6 Count', 'price': 2.28}, {'name': "Eggland's Best Large White Eggs, 18 Count", 'price': 5.12}, {'name': 'Marketside Large Cage-Free Brown Eggs, 12 Count', 'price': 5.54}, {'name': 'Great Value Cage-Free White Eggs, Large, 18 Count', 'price': 4.76}, {'name': 'Great Value Cage Free Large White Eggs, 12 Count', 'price': 3.22}, {'name': 'Vital Farms Pasture Raised Grade A Large Brown Eggs, 12 Count', 'price': 7.08}, {'name': "Eggland's Best Extra Large White Eggs, 12 Count", 'price': 3.68}, {'name': "Eggland's Best Extra Large White Eggs, 18 Count", 'price': 7.33}, {'name': 'Great Value, Jumbo White Eggs, 12 Count', 'price': 4.96}, {'name': 'Great Value Hard Boiled Eggs, 9.31 oz, 6 Count', 'price': 3.16}, {'name': 'Blue Sky Farms Free Range, Large Brown Eggs, 12 Count', 'price': 4.94}, {'name': 'Great Value Large Brown Eggs, 12 Count', 'price': 4.72}, {'name': "Eggland's Best 100% USDA Organic Certified Large Brown Eggs, 12 Count", 'price': 6.0}, {'name': 'Blue Sky Farms Organic, Free Range Large Brown Eggs, 12 Count', 'price': 5.94}, {'name': 'Great Day Farms Hard-Boiled Eggs, 9 oz, 6 Count', 'price': 2.97}, {'name': 'Great Day Farms Hard-Boiled Eggs, 2 Eggs', 'price': 1.57}, {'name': 'STICKY FRIED EGGS (12 CT)', 'price': 28.99}, {'name': '30 hole quail egg cartons for jumbo quail eggs 50 count', 'price': 47.29}, {'name': 'Crystal Joys Rose Quartz Ema Egg, Purple', 'price': 8.0}, {'name': 'Eastland Food Asian Best  Quail Eggs, 15 oz', 'price': 10.99}, {'name': "Patrick's Best Garden Eggs 800g", 'price': 13.99}, {'name': 'Eggs, Set of 8', 'price': 52.69}, {'name': "2pcs Pickled Eggs, o Artificial Igrediets, Glute , 0g Sugar, 6g Protei, Grade A Eggs, Boiled ad Peeled (16oz, Garlic ' Oio)", 'price': 42.38}, {'name': 'Amish Wedding Pickled Eggs, 32 Oz Glass Jar, Ready to Eat', 'price': 21.3}, {'name': 'Just Crack an Egg All American Scramble Breakfast Bowl Kit with Potatoes, Sharp Cheddar Cheese and Uncured Bacon, 3 oz. Cup', 'price': 2.56}, {'name': 'Egg Blue', 'price': 105.05}, {'name': '12 Freeze Dried Duck Eggs approximately 8 oz', 'price': 30.0}, {'name': "Herb's Pickled Eggs 67 oz Gallon size plastic jar Packed In Vinegar", 'price': 55.99}, {'name': 'Blue Eggs in Carton 3.5x5.5"', 'price': 16.97}, {'name': 'Crystal Joys Clear Quartz Ema Egg, Purple', 'price': 8.0}]
+
+
+
+
+
+
+
+default_brands = ['Roundy', 'Kroger', 'Simple Truth', 'Great Value', 'Kirkland Signature', 'Trader Joe', 'Good & Gather', 'Simply Nature']
+# Metro, Metro, Metro, Walmart, Costco, Trader Joe's, Target, Aldi
+
+
+def is_default_brand(product_name):
+    return any(brand in product_name for brand in default_brands)
+
+# Helper function to extract count
+def extract_count(product_name):
+    match = re.search(r'(\d+)\s*ct', product_name)
+    return int(match.group(1)) if match else None
+
+def calculate_similarity_and_price_per_count(store_a, store_b, brand_extractor):
+    # Extract brands
+    brand_a = brand_extractor.extract_brand(store_a['name'])
+    brand_b = brand_extractor.extract_brand(store_b['name'])
+    
+    # Extract count from product names
+    count_a = extract_count(store_a['name'])
+    count_b = extract_count(store_b['name'])
+
+    # If the counts are different, adjust similarity based on price per count
+    if count_a is not None and count_b is not None:
+        # If both have counts, calculate price per unit directly
+        price_per_count_a = store_a['price'] / count_a
+        price_per_count_b = store_b['price'] / count_b
+        price_difference = abs(price_per_count_a - price_per_count_b)
+        price_difference_percentage = (price_difference / min(price_per_count_a, price_per_count_b)) * 100
+    elif count_a is not None:
+        # If only first product has a count
+        price_per_count_a = store_a['price'] / count_a
+        price_per_count_b = store_b['price']
+        price_difference = abs(price_per_count_a - store_b['price'])
+        price_difference_percentage = (price_difference / min(price_per_count_a, store_b['price'])) * 100
+    elif count_b is not None:
+        # If only second product has a count
+        price_per_count_a = store_a['price']
+        price_per_count_b = store_b['price'] / count_b
+        price_difference = abs(store_a['price'] - price_per_count_b)
+        price_difference_percentage = (price_difference / min(store_a['price'], price_per_count_b)) * 100
+    else:
+        # If neither product has a count
+        price_per_count_a = store_a['price']
+        price_per_count_b = store_b['price']
+        price_difference = abs(store_a['price'] - store_b['price'])
+        price_difference_percentage = (price_difference / min(store_a['price'], store_b['price'])) * 100
+
+    # Calculate string similarity
+    similarity = difflib.SequenceMatcher(None, store_a['name'], store_b['name']).ratio()
+
+    # Enhance similarity with brand matching
+    if brand_a and brand_b:
+        brand_similarity = difflib.SequenceMatcher(None, brand_a, brand_b).ratio()
+        similarity = (similarity + brand_similarity) / 2
+
+    # Penalize mismatch in count by modifying similarity
+    count_similarity_penalty = 1 - abs(count_a - count_b) / max(count_a, count_b) if count_a and count_b else 1
+    adjusted_similarity = similarity * count_similarity_penalty
+
+    return adjusted_similarity, price_per_count_a, price_per_count_b, brand_a, brand_b
+
+# Initialize brand extractor
+brand_extractor = BrandExtractor()
+
+# Store best comparison for each product
+best_comparison = {}
+
+# Function to check if a product is from a default brand
+def is_default_brand(product_name):
+    return any(brand in product_name for brand in default_brands)
+
+# Loop through all products in both stores
+for store_a in metro_results:
+    best_match = None
+    highest_similarity = 0
+    for store_b in walmart_results:
+        # Check if both products are from default brands
+        if is_default_brand(store_a['name']) and is_default_brand(store_b['name']):
+            # Calculate similarity and price per count
+            similarity, price_a, price_b, brand_a, brand_b = calculate_similarity_and_price_per_count(
+                store_a, store_b, brand_extractor
+            )
+
+            # Keep track of the best match
+            if similarity > highest_similarity:
+                highest_similarity = similarity
+                best_match = {
+                    'store_a': store_a,
+                    'store_b': store_b,
+                    'similarity': similarity,
+                    'price_a': price_a,
+                    'price_b': price_b,
+                    'price_difference': abs(price_a - price_b),
+                    'brand_a': brand_a,
+                    'brand_b': brand_b
+                }
+
+    # Store the best match for each product
+    if best_match:
+        best_comparison[store_a['name']] = best_match
+
+# Print the best comparison results
+for product_name, comparison in best_comparison.items():
+    print(f"Store A: {comparison['store_a']['name']} - ${comparison['store_a']['price']}")
+    print(f"Store B: {comparison['store_b']['name']} - ${comparison['store_b']['price']}")
+    print(f"Brand A: {comparison.get('brand_a', 'N/A')}")
+    print(f"Brand B: {comparison.get('brand_b', 'N/A')}")
+    print(f"Similarity: {comparison['similarity']:.2f}")
+    print(f"Price Difference: ${comparison['price_difference']:.2f}\n")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+metro_results = [{'name': "Roundy's Large White Eggs 18 ct", 'price': 5.99}, {'name': "Roundy's Large White Eggs 12 ct", 'price': 3.99}, {'name': 'Simple Truth Natural Cage Free Large Brown Eggs 12 ct', 'price': 4.49}, {'name': 'Simple Truth Natural Cage Free Large Brown Eggs 18 ct', 'price': 6.49}, {'name': "Eggland's Best Classic Large White Eggs, 18 count 18 ct", 'price': 5.49}, {'name': 'S&R Egg Farm Large White Eggs 6 ct', 'price': 2.99}, {'name': "Eggland's Best Classic Large White Eggs, 24 count 24 ct", 'price': 6.99}, {'name': "Roundy's 60 Count Large White Eggs 60 ct", 'price': 19.95}, {'name': 'Dutch Farms Large White Eggs 6 ct', 'price': 1.79}, {'name': "Eggland's Best Classic Extra Large White Eggs, 12 count 12 ct", 'price': 3.79}, {'name': 'Dutch Farms Large White Eggs 18 ct', 'price': 4.99}, {'name': 'Dutch Farms Large White Eggs 30 ct', 'price': 7.99}, {'name': "Roundy's Jumbo White Eggs 12 ct", 'price': 4.39}, {'name': "Roundy's Extra Large White Eggs 12 ct", 'price': 4.19}, {'name': 'Simple Truth Organic Cage Free Large Brown Eggs 18 ct', 'price': 7.99}, {'name': "Phil's Free Range Large Eggs 12 ct", 'price': 4.99}, {'name': "Eggland's Best Classic Large White Eggs, 12 count 12 ct", 'price': 3.99}, {'name': 'Happy Egg Co. Free Range Large Brown Eggs 18 ct', 'price': 7.99}, {'name': "Phil's Cage Free Medium Eggs 12 ct", 'price': 3.79}, {'name': "Eggland's Best Pasture Raised Large Brown Eggs 12 ct", 'price': 6.29}, {'name': 'Vital Farms Pasture-Raised Large Brown Eggs 12 ct |', 'price': 7.99}, {'name': 'Simple Truth Natural Cage Free Medium Brown Eggs 12 ct', 'price': 4.39}, {'name': 'Dutch Farms Large White Eggs 12 ct', 'price': 4.29}, {'name': 'Vital Farms Pasture-Raised Large Brown Organic Eggs 12 ct', 'price': 9.99}]
+
+walmart_results = [{'name': 'Great Value, Large White Eggs, 12 Count', 'price': 3.97}, {'name': 'Great Value Large White Eggs, 18 Count', 'price': 5.87}, {'name': 'Great Value Large White Eggs, 36 Count', 'price': 11.67}, {'name': 'Great Value Large White Eggs, 60 Count', 'price': 19.26}, {'name': 'Marketside Cage-Free Large Brown Eggs, 18 Count', 'price': 7.82}, {'name': 'Great Value Extra Large White Eggs, 18 Count', 'price': 6.56}, {'name': 'Great Value Large White Eggs, 6 Count', 'price': 2.28}, {'name': "Eggland's Best Large White Eggs, 18 Count", 'price': 5.12}, {'name': 'Marketside Large Cage-Free Brown Eggs, 12 Count', 'price': 5.54}, {'name': 'Great Value Cage-Free White Eggs, Large, 18 Count', 'price': 4.76}, {'name': 'Great Value Cage Free Large White Eggs, 12 Count', 'price': 3.22}, {'name': 'Vital Farms Pasture Raised Grade A Large Brown Eggs, 12 Count', 'price': 7.08}, {'name': "Eggland's Best Extra Large White Eggs, 12 Count", 'price': 3.68}, {'name': "Eggland's Best Extra Large White Eggs, 18 Count", 'price': 7.33}, {'name': 'Great Value, Jumbo White Eggs, 12 Count', 'price': 4.96}, {'name': 'Great Value Hard Boiled Eggs, 9.31 oz, 6 Count', 'price': 3.16}, {'name': 'Blue Sky Farms Free Range, Large Brown Eggs, 12 Count', 'price': 4.94}, {'name': 'Great Value Large Brown Eggs, 12 Count', 'price': 4.72}, {'name': "Eggland's Best 100% USDA Organic Certified Large Brown Eggs, 12 Count", 'price': 6.0}, {'name': 'Blue Sky Farms Organic, Free Range Large Brown Eggs, 12 Count', 'price': 5.94}, {'name': 'Great Day Farms Hard-Boiled Eggs, 9 oz, 6 Count', 'price': 2.97}, {'name': 'Great Day Farms Hard-Boiled Eggs, 2 Eggs', 'price': 1.57}, {'name': 'STICKY FRIED EGGS (12 CT)', 'price': 28.99}, {'name': '30 hole quail egg cartons for jumbo quail eggs 50 count', 'price': 47.29}, {'name': 'Crystal Joys Rose Quartz Ema Egg, Purple', 'price': 8.0}, {'name': 'Eastland Food Asian Best  Quail Eggs, 15 oz', 'price': 10.99}, {'name': "Patrick's Best Garden Eggs 800g", 'price': 13.99}, {'name': 'Eggs, Set of 8', 'price': 52.69}, {'name': "2pcs Pickled Eggs, o Artificial Igrediets, Glute , 0g Sugar, 6g Protei, Grade A Eggs, Boiled ad Peeled (16oz, Garlic ' Oio)", 'price': 42.38}, {'name': 'Amish Wedding Pickled Eggs, 32 Oz Glass Jar, Ready to Eat', 'price': 21.3}, {'name': 'Just Crack an Egg All American Scramble Breakfast Bowl Kit with Potatoes, Sharp Cheddar Cheese and Uncured Bacon, 3 oz. Cup', 'price': 2.56}, {'name': 'Egg Blue', 'price': 105.05}, {'name': '12 Freeze Dried Duck Eggs approximately 8 oz', 'price': 30.0}, {'name': "Herb's Pickled Eggs 67 oz Gallon size plastic jar Packed In Vinegar", 'price': 55.99}, {'name': 'Blue Eggs in Carton 3.5x5.5"', 'price': 16.97}, {'name': 'Crystal Joys Clear Quartz Ema Egg, Purple', 'price': 8.0}]
+
+comparisons = ProductComparator.find_best_matches(metro_results, walmart_results)
+ProductComparator.print_comparisons(comparisons)
