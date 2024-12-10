@@ -145,6 +145,7 @@
         </table>
 
         <script>
+        const API_KEY = 'default_key'
 
         document.addEventListener("DOMContentLoaded", () => {
             const storedData = localStorage.getItem("priceComparisonData");
@@ -154,7 +155,7 @@
 
             async function updateUI(searchTerm) {
                 try {
-                    const compareResponse = await fetch(`http://localhost:8000/compare?search=${searchTerm}`);
+                    const compareResponse = await fetch(`/compare?search=${encodeURIComponent(searchTerm)}&api_key=${API_KEY}`);
                     if (!compareResponse.ok) {
                         console.warn(`Compare fetch failed with status: ${compareResponse.status}`);
                         return;

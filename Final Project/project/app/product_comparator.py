@@ -33,6 +33,9 @@ class ProductComparator:
             'pt': 8,
             'pint': 8,
             'oz': 128,
+            'ounce': 128,
+            'oz.': 128,
+            'ounces': 128,
             'fl oz': 128,
             'fluid ounce': 128,
             'fluid ounces': 128,
@@ -80,7 +83,8 @@ class ProductComparator:
             'kilogram': 2.20462,  # 1 kg = 2.20462 pounds
             'kg': 2.20462,
             'ounce': 16,
-            'oz': 16
+            'oz': 16,
+            'ounces': 16
         }
     }
 
