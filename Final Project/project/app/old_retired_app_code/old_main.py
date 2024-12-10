@@ -3,7 +3,7 @@ from flask_cors import CORS
 import os
 from costco_service import search_costco
 from metro_service import search_metro_market
-from aldi_service import search_aldi
+from project.app.old_retired_code.aldi_service import search_aldi
 from walmart_service import search_walmart
 from project.app.unit_conversion import compare_prices
 
