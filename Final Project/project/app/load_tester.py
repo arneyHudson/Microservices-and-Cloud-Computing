@@ -7,9 +7,9 @@ class PriceComparisonUser(HttpUser):
 
     # List of sample search terms to simulate realistic queries
     search_terms = [
-        'milk', 'bread', 'eggs', 'cheese', 'chicken', 
-        'apple', 'banana', 'toilet paper', 'water', 
-        'coffee', 'pasta', 'rice', 'cereal'
+        'milk', 'bread', 'eggs', 'cheese', 'chicken breast', 
+        'apple', 'banana', 'toilet paper', 'greek yogurt', 
+        'coffee', 'pasta', 'rice', 'cereal', 'orange juice', 
     ]
 
     @task

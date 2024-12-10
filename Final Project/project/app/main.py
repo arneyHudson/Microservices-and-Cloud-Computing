@@ -106,8 +106,24 @@ def get_prices_from_stores(search_term):
     Returns:
         tuple: Metro and Walmart search results
     """
-    metro_results = search_metro_market(search_term)
-    walmart_results = search_walmart(search_term)
+    metro_results = None
+    walmart_results = None
+    
+    try:
+        metro_results = search_metro_market(search_term)
+        if metro_results is None:
+            raise ValueError(f"No results found for Metro Market for '{search_term}'")
+    except Exception as e:
+        app.logger.error(f"Metro Market search failed for '{search_term}': {e}")
+    
+    try:
+        walmart_results = search_walmart(search_term)
+        if walmart_results is None:
+            raise ValueError(f"No results found for Walmart for '{search_term}'")
+    except Exception as e:
+        app.logger.error(f"Walmart search failed for '{search_term}': {e}")
+        walmart_results = None  # Handle failure and return None or fallback data
+        
     return metro_results, walmart_results
 
 @app.route('/compare', methods=['GET'])
@@ -119,6 +135,7 @@ def compare():
     Returns:
         JSON: Comparison results
     """
+    USAGE_STATS['total_requests'] += 1
     search_term = request.args.get('search', "").lower()
     
     # Validate search term
@@ -129,6 +146,19 @@ def compare():
         }), 400
     
     metro_results, walmart_results = get_prices_from_stores(search_term)
+    
+    if metro_results is None:
+        return jsonify({
+            'error': 'No results found for metro market for the search term ' + search_term,
+            'message': 'No results found for metro market for the search term ' + search_term
+        }), 404
+        
+    if walmart_results is None:
+        return jsonify({
+            'error': 'No results found for walmart for the search term ' + search_term,
+            'message': 'No results found for walmart for the search term ' + search_term
+        }), 404
+        
     comparisons = ProductComparator.find_best_matches(metro_results, walmart_results)
     
     return jsonify(comparisons)

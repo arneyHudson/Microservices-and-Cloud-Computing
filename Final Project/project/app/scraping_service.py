@@ -10,6 +10,7 @@ import re
 
 def create_webdriver():
     options = webdriver.ChromeOptions()
+    options.add_argument("--start-minimized")
     # Ensure remote Selenium service is used
     driver = webdriver.Remote(
         command_executor="http://selenium:4444/wd/hub",
@@ -35,13 +36,14 @@ def remove_duplicates(products):
     """
     Removes duplicate products based on the 'name' field while keeping the first occurrence.
     """
-    seen_names = set()
+    seen_products = set()
     unique_products = []
 
     for product in products:
-        if product['name'] not in seen_names:
+        product_tuple = (product['name'], product['price'])
+        if product_tuple not in seen_products:
             unique_products.append(product)
-            seen_names.add(product['name'])
+            seen_products.add(product_tuple)
 
     return unique_products
 
@@ -179,9 +181,10 @@ def search_walmart(search_term):
         # Parse product details
         products = parse_walmart_products(soup)
         if products:
-            products = remove_duplicates(products)
+            products = remove_duplicates(products)            
+            return products
 
-        return products
+        return None
     except Exception as e:
         print(f"Error during Walmart scraping: {e}")
         return []
@@ -246,8 +249,9 @@ def search_metro_market(search_term):
         products = parse_products(soup)
         if products:
             products = remove_duplicates(products)
+            return products
 
-        return products
+        return None
     except Exception as e:
         print(f"Error during scraping Metro Market: {e}")
         return []

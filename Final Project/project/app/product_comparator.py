@@ -41,6 +41,13 @@ class ProductComparator:
             'fluid ounces': 128,
             'liter': 3.78541,
             '1/2 liter': 7.57082,
+            'lb': 8.3454,
+            'lbs': 8.3454,
+            'pound': 8.3454,
+            'pounds': 8.3454,
+            'kilogram': 3.78541,
+            'kilograms': 3.78541,
+            'kg': 3.78541
         }, 
         '1/2 gallon': {
             'gallon': 0.5,
@@ -274,6 +281,11 @@ class ProductComparator:
         count_metro = cls.extract_count(metro_product_name)
         count_walmart = cls.extract_count(walmart_product_name)
 
+        if (count_metro is not None and metro_quantity is not None) or \
+            (count_walmart is not None and walmart_quantity is not None) or \
+           (count_metro is None and count_walmart is None):
+            return None
+        
         # Calculate price per count
         def calculate_price_per_count(price, count, price_per_gallon=None):
             if count >= 1 and price_per_gallon is not None:
